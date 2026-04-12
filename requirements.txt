@@ -1,0 +1,25 @@
+# ratri — HRCCS observation simulator
+# Install with: pip install -r requirements.txt
+
+# Core numerics
+numpy>=1.24
+scipy>=1.10
+
+# Astronomy
+astropy>=5.3
+astroplan>=0.9
+astroquery>=0.4.6
+
+# Plotting
+matplotlib>=3.7
+
+# Data handling
+pandas>=1.5
+h5py>=3.8        # for loading HDF5 planet model files
+
+# ESO SkyCalc CLI — required to download telluric skytable files
+# Run: cd atm_transmission/ && python download_skytables.py
+skycalc-cli>=1.0
+
+# Optional — petitRADTRANS (planet spectrum generation, not required for ratri itself)
+# petitRADTRANS>=2.4

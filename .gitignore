@@ -1,0 +1,6 @@
+atm_transmission/*.fits
+output/
+ratri_preview_output/
+spectra_cache/
+instrument_grids*
+__pycache__/
