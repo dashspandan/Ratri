@@ -2,7 +2,7 @@
 
 **ratri** is a Python-based observation simulator and planning tool for High-Resolution Cross-Correlation Spectroscopy (HRCCS) of exoplanet atmospheres. It simulates time-series stellar spectra including telluric absorption, sky emission, instrument throughput, and optional planet model injection, for a range of ground-based high-resolution spectrographs.
 
-Supported instruments: CRIRES+, CARMENES, GIANO, SPIRou, ANDES, ANDES (CARMENES CCD), TMT+GIANO CCD, NLOT+GIANO CCD.
+Supported instruments: CRIRES+ (up to K band), CARMENES, GIANO, SPIRou, ANDES, ANDES (CARMENES CCD), TMT+GIANO CCD, NLOT+GIANO CCD.
 
 ---
 
@@ -100,7 +100,7 @@ is safe. The download covers:
 
 ### Instrument grid files
 
-Download the files from [here](https://drive.google.com/file/d/1nvXSorHwQLGJOmeOqToXXGcI4yFy-eYc/view?usp=drive_link). If they are not available for some reason, please contact me.
+Download the files from [here](https://drive.google.com/file/d/1nvXSorHwQLGJOmeOqToXXGcI4yFy-eYc/view?usp=drive_link). If they are not available for some reason, please contact me. The crires+ files available in this folder are the only ones available to simulate using ratri for now. Other modes will be added in the future.
 
 #### CRIRES+
 Place instrument grid `.npy` files in `./instrumentgrids_crires/`:
