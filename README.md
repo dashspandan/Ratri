@@ -93,10 +93,12 @@ are required. The script calls the ESO SkyCalc REST API directly, avoiding
 the `skycalc_cli` package which is broken on Python 3.11+. Already-downloaded files are skipped automatically, so re-running
 is safe. The download covers:
 ```
-0.05, 0.1, 0.25, 0.5, 1.0, 1.25, 1.5, 2.5, 3.0, 3.5, 5.0, 6.25, 7.5, 10.0, 15.0, 20.0
+0.05, 0.1, 0.25, 0.5, 1.0, 1.5, 2.5, 3.5, 5.0, 7.5, 10.0, 20.0
 ```
 
 ### Instrument grid files
+
+Download the files from [here](https://drive.google.com/file/d/1nvXSorHwQLGJOmeOqToXXGcI4yFy-eYc/view?usp=drive_link). If they are not available for some reason, please contact me.
 
 #### CRIRES+
 Place instrument grid `.npy` files in `./instrumentgrids_crires/`:
@@ -169,7 +171,7 @@ Identifies the best observable nights within your date range and saves them to a
 python {planet}_{ob}.py --simulate
 ```
 
-Runs the full HRCCS observation simulation and saves flux cubes, SNR cubes, and diagnostic plots to the output directory.
+Runs the full HRCCS observation simulation and saves flux cubes, SNR cubes, and diagnostic plots to the output directory. We have kept an example WASP-76b_tm.py file for you to examine and play with.
 
 Running without arguments does both steps sequentially:
 
@@ -177,7 +179,7 @@ Running without arguments does both steps sequentially:
 python {planet}_{ob}.py
 ```
 
-### Step 4 — Quick-look planning (optional)
+### Step 4 — Quick-look planning (optional, and only if you already have a model exoplanet spectrum in the format specified)
 
 For a fast SNR and detectability estimate before committing to a full simulation, edit `ratri_1D.py` to set your target, instrument, molecule folder, and RV parameters, then run:
 
