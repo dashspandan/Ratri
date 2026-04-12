@@ -42,11 +42,13 @@ conda activate ratri
 ### 3. Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/ratri.git
-cd ratri
+git clone https://github.com/dashspandan/Ratri
+cd Ratri
 ```
 
 ### 4. Install dependencies
+
+Simplest
 
 ```bash
 pip install -r requirements.txt
