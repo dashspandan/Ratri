@@ -213,13 +213,17 @@ python {planet}_{ob}.py
 
 ## PWV quality tiers
 
-| Tier | Median PWV | Typical sites |
-|------|------------|---------------|
-| `excellent` | 0.3 mm | Cerro Armazones (best conditions) |
-| `very_good` | 1.25 mm | Mauna Kea, Hanle (NLOT) |
-| `good` | 3.0 mm | Cerro Paranal, La Palma |
-| `avg` | 6.25 mm | Calar Alto |
-| `bad` | 15.0 mm | Poor conditions |
+PWV tiers assume a lognormal distribution centered around the median PWV values. The tiers are as follows:
+
+| Tier | Median PWV |
+|------|------------|
+| `excellent` | 0.3 mm |
+| `very_good` | 1.25 mm |
+| `good` | 3.0 mm |
+| `avg` | 6.25 mm |
+| `bad` | 15.0 mm |
+
+As you run the runner script, you'll see that each site already has a default setting based on references in literature. Input a different tier if you want a betetr or worse night.
 
 ---
 
@@ -285,4 +289,4 @@ Please cite:
 
 ## License
 
-MIT License. See `LICENSE` for details.
+MIT License. See the `LICENSE` tab [here](https://github.com/dashspandan/Ratri?tab=MIT-1-ov-file) for details.
