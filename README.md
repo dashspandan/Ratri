@@ -88,13 +88,8 @@ tiers and saves them in `./atm_transmission/` with the naming convention:
 skytable_a_1.0_p_{PWV}.fits
 ```
 
-Internet access and the `requests` package (installed via `requirements.txt`)
-are required. The script calls the ESO SkyCalc REST API directly, avoiding
-the `skycalc_cli` package which is broken on Python 3.11+. Already-downloaded files are skipped automatically, so re-running
-is safe. The download covers:
-```
-0.05, 0.1, 0.25, 0.5, 1.0, 1.25, 1.5, 2.5, 3.0, 3.5, 5.0, 6.25, 7.5, 10.0, 15.0, 20.0
-```
+Internet access is required. The `skycalc_cli` package is broken on Python 3.11+, which is why we have mandated working in a conda environment with python 3.10. Already-downloaded files are skipped automatically, so re-running is safe.
+
 
 ### Instrument grid files
 
@@ -149,6 +144,7 @@ Wavelength units are auto-detected (cm, micron, nm, Angstrom). For multi-molecul
 For a fast SNR and detectability estimate before committing to a full simulation, edit `ratri_1D.py` to set your target, instrument, molecule folder, and RV parameters, then run:
 
 ```bash
+conda activate ratri
 python ratri_1D.py
 ```
 
@@ -168,7 +164,7 @@ conda activate ratri
 python generate_runner.py
 ```
 
-This launches an interactive wizard that:
+This launches an interactive command-line wizard that:
 - Queries the NASA Exoplanet Archive for orbital and stellar parameters
 - Lets you select literature references per parameter
 - Prompts for instrument, observing mode, exposure time, and date range
@@ -223,7 +219,7 @@ PWV tiers assume a lognormal distribution centered around the median PWV values.
 | `avg` | 6.25 mm |
 | `bad` | 15.0 mm |
 
-As you run the runner script, you'll see that each site already has a default setting based on references in literature. Input a different tier if you want a betetr or worse night.
+As you run the generator script, you'll see that each site already has a default setting based on references in literature. Input a different tier if you want a better or worse night.
 
 ---
 
@@ -289,4 +285,4 @@ Please cite:
 
 ## License
 
-MIT License. See the `LICENSE` tab [here](https://github.com/dashspandan/Ratri?tab=MIT-1-ov-file) for details.
+Please see the `MIT LICENSE` tab [here](https://github.com/dashspandan/Ratri?tab=MIT-1-ov-file) for details.
