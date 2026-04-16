@@ -138,7 +138,7 @@ def signalcalc(inst, modes, exp_time, fn, fn_tr, fn_sky): ##fn is for ither just
 	if inst == 'crires+':
 		i = 0
 		while i < len(modes):
-			data = np.load('./instrument_grids_crires/crires+'+modes[i]+'mode.npy')
+			data = np.load('./instrumentgrids_crires/crires+'+modes[i]+'mode.npy')
 			if i == 0:
 				n_orders = len(data)
 				wav = np.zeros((n_orders, len(data[0][0]))) ## 2D cuboid with (n_orders, n_pixels) as dimensions
@@ -2646,21 +2646,15 @@ def ratri_preview_ccf(
 	)
 	mask_sn = sn_met_comb < sn_mask_threshold
 
-	# Build CCF template
+	# Build CCF template -- no continuum normalisation
+	# The injected signal preserves absolute depths, so the template
+	# should match the data without additional normalisation.
+	# Rolling normalisation would remove broadband information that
+	# is still present in the data residuals without Gaussian filtering.
 	if ob == 'em':
-		rollmin  = (pd.Series(fp_fs_broad)
-		            .rolling(500, min_periods=1).min().values)
-		rollmin  = np.where(np.abs(rollmin) < 1e-30, 1e-30, rollmin)
-		template = fp_fs_only_broad / rollmin
-		template = np.clip(template, 0.0, None)
+		template = fp_fs_only_broad
 	else:
-		depth_total = 1.0 - tr_d_broad
-		depth_only  = 1.0 - tr_d_only_broad
-		rollmax  = (pd.Series(depth_total)
-		            .rolling(500, min_periods=1).max().values)
-		rollmax  = np.where(np.abs(rollmax) < 1e-30, 1e-30, rollmax)
-		template = depth_only / rollmax
-		template = np.clip(template, None, 1.0)
+		template = 1.0 - tr_d_only_broad
 
 	# RV grid
 	rv_grid = np.arange(rv_centre - rv_left,
