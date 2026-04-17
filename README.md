@@ -47,7 +47,8 @@ cd Ratri
 ```
 
 ### 4. Install dependencies
-
+(Simplest)
+ 
 ```bash
 pip install -r requirements.txt
 ```
@@ -96,7 +97,7 @@ Internet access is required. The `skycalc_cli` package is broken on Python 3.11+
 Download the files from [here](https://drive.google.com/file/d/1nvXSorHwQLGJOmeOqToXXGcI4yFy-eYc/view?usp=drive_link). If they are not available for some reason, please contact me. The crires+ modes files available in this folder are the only ones available to simulate using ratri for now. Other modes will be added in the future.
 
 #### CRIRES+
-Place instrument grid `.npy` files in `./instrumentgrids_crires/`:
+Place instrument grid `.npy` files in `./instrument_grids_crires/`:
 ```
 crires+{mode}mode.npy    # e.g. crires+y1028mode.npy
 ```
