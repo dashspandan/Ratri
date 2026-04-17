@@ -138,7 +138,7 @@ def signalcalc(inst, modes, exp_time, fn, fn_tr, fn_sky): ##fn is for ither just
 	if inst == 'crires+':
 		i = 0
 		while i < len(modes):
-			data = np.load('./instrumentgrids_crires/crires+'+modes[i]+'mode.npy')
+			data = np.load('./instrument_grids_crires/crires+'+modes[i]+'mode.npy')
 			if i == 0:
 				n_orders = len(data)
 				wav = np.zeros((n_orders, len(data[0][0]))) ## 2D cuboid with (n_orders, n_pixels) as dimensions
