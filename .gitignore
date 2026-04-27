@@ -4,3 +4,4 @@ ratri_preview_output/
 spectra_cache/
 instrument_grids*
 __pycache__/
+planet_model/

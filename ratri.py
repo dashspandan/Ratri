@@ -138,7 +138,7 @@ def signalcalc(inst, modes, exp_time, fn, fn_tr, fn_sky): ##fn is for ither just
 	if inst == 'crires+':
 		i = 0
 		while i < len(modes):
-			data = np.load('./instrument_grids_crires/crires+'+modes[i]+'mode.npy')
+			data = np.load('./instrumentgrids_crires/crires+'+modes[i]+'mode.npy')
 			if i == 0:
 				n_orders = len(data)
 				wav = np.zeros((n_orders, len(data[0][0]))) ## 2D cuboid with (n_orders, n_pixels) as dimensions
@@ -952,6 +952,8 @@ _INSTRUMENT_PARAMS = {
 	'andes':            dict(res=100000, t_duty=3.83, t_nod=24, nod_seq='ABBA'),
 	# andes_ccd_carmenes modes: 'YJH' only
 	'andes_ccd_carmenes':dict(res=100000,t_duty=34,   t_nod=0,  nod_seq=None),
+	# TMT uses GIANO CCD config — resolution TBC pending instrument selection
+	'tmt_ccd_giano':    dict(res=100000, t_duty=60,   t_nod=0,  nod_seq=None),  # res TBC
 	# NLOT uses GIANO CCD config — resolution and duty cycle TBC pending first-light instrument selection
 	'nlot_ccd_giano':   dict(res=60000,  t_duty=60,   t_nod=0,  nod_seq=None),  # res TBC, lower end estimate
 }
