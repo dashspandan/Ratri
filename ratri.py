@@ -134,6 +134,11 @@ def signalcalc(inst, modes, exp_time, fn, fn_tr, fn_sky): ##fn is for ither just
 	if inst == 'tmt':
 		tel_rad = 0.5*30*1e2 ##in cm, change for each instrument that you add here within another if statement
 		area = np.pi*tel_rad**2
+
+	if inst == 'ghost':
+		tel_rad = 0.5*8.1*1e2
+		obs_rad = 0.5*1*1e2
+		area = np.pi*(tel_rad**2-obs_rad**2)
 	
 	if inst == 'crires+':
 		i = 0
@@ -322,72 +327,157 @@ def signalcalc(inst, modes, exp_time, fn, fn_tr, fn_sky): ##fn is for ither just
 		wav = np.array(arr_wav)
 		res_el = wav/R
 		th = 0.08*np.ones_like(wav)
+
+	if inst == 'ghost':
+		wav_blue = np.load('./instrument_grids_ghost/ghost_wav_blue.npy') * 10
+		wav_red  = np.load('./instrument_grids_ghost/ghost_wav_red.npy')  * 10
+
+		i = 0
+		j = 0
+		a, b = wav_blue.shape
+		res_el_blue = np.zeros((a, b))
+		while i < a:
+			while j < b:
+				if j < b - 1:
+					res_el_blue[i, j] = wav_blue[i, j+1] - wav_blue[i, j]
+				if j == b - 1:
+					res_el_blue[i, j] = res_el_blue[i, j-1]
+				j = j + 1
+			j = 0
+			i = i + 1
+
+		i = 0
+		j = 0
+		a, b = wav_red.shape
+		res_el_red = np.zeros((a, b))
+		while i < a:
+			while j < b:
+				if j < b - 1:
+					res_el_red[i, j] = wav_red[i, j+1] - wav_red[i, j]
+				if j == b - 1:
+					res_el_red[i, j] = res_el_red[i, j-1]
+				j = j + 1
+			j = 0
+			i = i + 1
+
+		th_blue = np.load('./instrument_grids_ghost/ghost_eta_blue.npy')
+		th_red  = np.load('./instrument_grids_ghost/ghost_eta_red.npy')
 	
-	mask_1 = th>0.5 #mask for abormally behaving efficiencies
-	th[th>0.5] = 0 #set abnormally large valued pixel thoroughputs to 0 (residuals of division of totalth and atmth
-	th_m = np.ma.masked_invalid(th) #mask for NaN values
-	mask_2 = np.ma.getmask(th_m) ##mask for NaNs
-	th = th_m.filled(fill_value = 0) #set these masked values to 0 as well
-	
-	ph_data_con_fit = splev(wav, fn, der = 0) ##evaluate photon flux at these wavelengths
-	tr_con_fit = splev(wav, fn_tr, der = 0) ##atmospheric transmission at these wavelengths
-	
-	ph_data_det_top = ph_data_con_fit*tr_con_fit
-	
-	ph_rec_det_eff = ph_data_det_top*exp_time*area*th
-	ph_rec_det = ph_rec_det_eff*res_el
-	mask_3 = ph_rec_det < 1 ##some negative values and less than 1 photon values will be masked
-	ph_rec_det[ph_rec_det < 1] = 1 ##some values (541 total) are found to be negative (don't know why, fitting issues?) set them to 0
-	
-	if inst == 'carmenes' or 'spirou' or 'giano':
+	if inst != 'ghost':
+		mask_1 = th > 0.5
+		th[th > 0.5] = 0
+		th_m   = np.ma.masked_invalid(th)
+		mask_2 = np.ma.getmask(th_m)
+		th     = th_m.filled(fill_value=0)
+
+		ph_data_con_fit = splev(wav, fn,    der=0)
+		tr_con_fit      = splev(wav, fn_tr, der=0)
+		ph_data_det_top = ph_data_con_fit * tr_con_fit
+
+		ph_rec_det_eff = ph_data_det_top * exp_time * area * th
+		ph_rec_det     = ph_rec_det_eff * res_el
+		mask_3         = ph_rec_det < 1
+		ph_rec_det[ph_rec_det < 1] = 1
+
 		ph_noise = ph_rec_det**0.5
-		sn_met = ph_rec_det/ph_noise
-	
-	if inst == 'crires+':
-		ph_noise = ph_rec_det**0.5
-		rod_noise = 10*(7.5**2)
-		sn_met = ph_rec_det/np.sqrt(ph_noise**2 + rod_noise)
-	
-	if inst == 'andes' or 'andes_ccd_carmenes':
-		ph_noise = ph_rec_det**0.5
-		sky_fl = splev(wav, fn_sky, der = 0)
-		ph_data_det_sky_top = sky_fl*tr_con_fit*exp_time*area*th*res_el
-		#ph_data_det_sky_top = sky_fl*exp_time*area*th*res_el
-		ph_data_det_sky_top[ph_data_det_sky_top < 1] = 1
-		sky_noise = ph_data_det_sky_top**0.5
-		sn_met = ph_rec_det/np.sqrt(ph_noise**2 + sky_noise**2)
-	
-	if inst == 'tmt_ccd_giano':
-		ph_noise = ph_rec_det**0.5
-		sky_fl = splev(wav, fn_sky, der = 0)
-		ph_data_det_sky_top = sky_fl*tr_con_fit*exp_time*area*th*res_el
-		#ph_data_det_sky_top = sky_fl*exp_time*area*th*res_el
-		ph_data_det_sky_top[ph_data_det_sky_top < 1] = 1
-		sky_noise = ph_data_det_sky_top**0.5
-		rod_noise = 5**2
-		sn_met = ph_rec_det/np.sqrt(ph_noise**2 + sky_noise**2+rod_noise)
-	
-	if inst == 'nlot_ccd_giano':
-		# SNR: shot noise + sky + read noise (5e- assumed, TBC)
-		ph_noise = ph_rec_det**0.5
-		sky_fl = splev(wav, fn_sky, der = 0)
-		ph_data_det_sky_top = sky_fl*tr_con_fit*exp_time*area*th*res_el
-		ph_data_det_sky_top[ph_data_det_sky_top < 1] = 1
-		sky_noise = ph_data_det_sky_top**0.5
-		rod_noise = 5**2  # read noise TBC
-		sn_met = ph_rec_det/np.sqrt(ph_noise**2 + sky_noise**2 + rod_noise)
-	
-	if inst == 'tmt':
-		ph_noise = ph_rec_det**0.5
-		sky_fl = splev(wav, fn_sky, der = 0)
-		ph_data_det_sky_top = sky_fl*tr_con_fit*exp_time*area*th*res_el
-		#ph_data_det_sky_top = sky_fl*exp_time*area*th*res_el
-		ph_data_det_sky_top[ph_data_det_sky_top < 1] = 1
-		sky_noise = ph_data_det_sky_top**0.5
-		rod_noise = 5**2
-		sn_met = ph_rec_det/np.sqrt(ph_noise**2 + sky_noise**2+rod_noise)
-	
-	return ph_rec_det, ph_noise, sn_met, wav, mask_1+mask_2+mask_3
+
+		sky_fl     = splev(wav, fn_sky, der=0)
+		ph_det_sky = sky_fl * tr_con_fit * exp_time * area * th * res_el
+		ph_det_sky[ph_det_sky < 1] = 1
+		sky_noise  = ph_det_sky**0.5
+
+		if inst in ('carmenes', 'spirou', 'giano'):
+			# NIR H2RG detectors
+			# GIANO:    rod=5.0 e-, dark=0.05  e-/s  (Claudi et al. 2016)
+			# SPIRou:   rod=5.0 e-, dark=0.007 e-/s  (Donati et al. 2020)
+			# CARMENES: rod=2.0 e-, dark=0.002 e-/s  (Mawet et al. 2017, NIR H2RG)
+			rod_noise  = {'carmenes': 2.0**2, 'spirou': 5.0**2, 'giano': 5.0**2}[inst]
+			dark       = {'carmenes': 0.002,  'spirou': 0.007,  'giano': 0.05  }[inst]
+			dark_noise = dark * exp_time
+			sn_met = ph_rec_det / np.sqrt(ph_noise**2 + sky_noise**2 + dark_noise + rod_noise)
+
+		if inst == 'crires+':
+			# H2RG: rod=7.5 e-, dark=0.028 e-/s (Dorn et al. 2016)
+			rod_noise  = 7.5**2
+			dark_noise = 0.028 * exp_time
+			sn_met = ph_rec_det / np.sqrt(ph_noise**2 + sky_noise**2 + dark_noise + rod_noise)
+
+		if inst in ('andes', 'andes_ccd_carmenes'):
+			# YJH arm, H2RG proxy: rod=2.0 e-, dark=0.002 e-/s (same as CARMENES NIR)
+			rod_noise  = 2.0**2
+			dark_noise = 0.002 * exp_time
+			sn_met = ph_rec_det / np.sqrt(ph_noise**2 + sky_noise**2 + dark_noise + rod_noise)
+
+		if inst in ('tmt_ccd_giano', 'nlot_ccd_giano', 'tmt'):
+			# Uses GIANO grid -- same detector noise as GIANO (Claudi et al. 2016)
+			# rod=5.0 e-, dark=0.05 e-/s
+			rod_noise  = 5.0**2
+			dark_noise = 0.05 * exp_time
+			sn_met = ph_rec_det / np.sqrt(ph_noise**2 + sky_noise**2 + dark_noise + rod_noise)
+
+		return ph_rec_det, ph_noise, sn_met, wav, mask_1 + mask_2 + mask_3
+
+	if inst == 'ghost':
+		mask_1_blue = th_blue > 0.8
+		th_blue[th_blue > 0.8] = 0
+		th_m_blue   = np.ma.masked_invalid(th_blue)
+		mask_2_blue = np.ma.getmask(th_m_blue)
+		th_blue     = th_m_blue.filled(fill_value=0)
+
+		ph_data_con_fit_blue = splev(wav_blue, fn,    der=0)
+		tr_con_fit_blue      = splev(wav_blue, fn_tr, der=0)
+		ph_data_det_top_blue = ph_data_con_fit_blue * tr_con_fit_blue
+
+		ph_rec_det_blue = ph_data_det_top_blue * exp_time * area * th_blue * res_el_blue
+		mask_3_blue     = ph_rec_det_blue < 1
+		ph_rec_det_blue[ph_rec_det_blue < 1] = 1
+
+		mask_1_red = th_red > 0.8
+		th_red[th_red > 0.8] = 0
+		th_m_red   = np.ma.masked_invalid(th_red)
+		mask_2_red = np.ma.getmask(th_m_red)
+		th_red     = th_m_red.filled(fill_value=0)
+
+		ph_data_con_fit_red = splev(wav_red, fn,    der=0)
+		tr_con_fit_red      = splev(wav_red, fn_tr, der=0)
+		ph_data_det_top_red = ph_data_con_fit_red * tr_con_fit_red
+
+		ph_rec_det_red = ph_data_det_top_red * exp_time * area * th_red * res_el_red
+		mask_3_red     = ph_rec_det_red < 1
+		ph_rec_det_red[ph_rec_det_red < 1] = 1
+
+		# Noise
+		# Blue/SLOW:   rod=2.1  e-,  dark=1.0/3600 e-/s  (GHOST Table 1+2)
+		# Red/MEDIUM:  rod=2.55 e-,  dark=0.9/3600 e-/s
+		ph_noise_blue = ph_rec_det_blue**0.5
+		ph_noise_red  = ph_rec_det_red**0.5
+
+		sky_fl_blue = splev(wav_blue, fn_sky, der=0)
+		ph_det_sky_blue = sky_fl_blue * tr_con_fit_blue * exp_time * area * th_blue * res_el_blue
+		ph_det_sky_blue[ph_det_sky_blue < 1] = 1
+		sky_noise_blue = ph_det_sky_blue**0.5
+
+		sky_fl_red = splev(wav_red, fn_sky, der=0)
+		ph_det_sky_red = sky_fl_red * tr_con_fit_red * exp_time * area * th_red * res_el_red
+		ph_det_sky_red[ph_det_sky_red < 1] = 1
+		sky_noise_red = ph_det_sky_red**0.5
+
+		rod_noise_blue  = 2.1**2
+		rod_noise_red   = 2.55**2
+		dark_noise_blue = (1.0 / 3600.0) * exp_time
+		dark_noise_red  = (0.9 / 3600.0) * exp_time
+
+		sn_met_blue = ph_rec_det_blue / np.sqrt(
+			ph_noise_blue**2 + sky_noise_blue**2 + dark_noise_blue + rod_noise_blue)
+		sn_met_red  = ph_rec_det_red  / np.sqrt(
+			ph_noise_red**2  + sky_noise_red**2  + dark_noise_red  + rod_noise_red)
+
+		return (ph_rec_det_blue, ph_rec_det_red), \
+		       (ph_noise_blue,   ph_noise_red), \
+		       (sn_met_blue,     sn_met_red), \
+		       (wav_blue,        wav_red), \
+		       (mask_1_blue + mask_2_blue + mask_3_blue,
+		        mask_1_red  + mask_2_red  + mask_3_red)
 
 
 def doppler(wavlen, shift): ##shift in kms-1, +shift is away from each other and -ve is towards
