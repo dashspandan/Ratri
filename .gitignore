@@ -7,3 +7,4 @@ __pycache__/
 planet_models/
 *_tm.py
 *_em.py
+planet_model/
