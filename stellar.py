@@ -82,7 +82,8 @@ def recommend_library(teff):
 	str   recommended library key ('phoenix', 'btsettl', 'atlas9', 'marcs')
 	"""
 	if teff < 3500:
-		default = 'btsettl'
+		#default = 'btsettl'
+		default = 'phoenix'
 	elif teff <= 7000:
 		default = 'phoenix'
 	else:
