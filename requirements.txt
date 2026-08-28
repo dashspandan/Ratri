@@ -19,6 +19,7 @@ h5py>=3.8        # for loading HDF5 planet model files
 
 # ESO SkyCalc CLI — required to download telluric skytable files
 # Run: cd atm_transmission/ && python download_skytables.py
+setuptools<=81.0.0
 skycalc-cli>=1.0
 
 # Optional — petitRADTRANS (planet spectrum generation, not required for ratri itself)
